@@ -235,9 +235,11 @@ def announce_highest(who, last_score=0, running_high=0):
     assert who == 0 or who == 1, 'The who argument should indicate a player.'
     # BEGIN PROBLEM 7
     "*** YOUR CODE HERE ***"
+    # 真正的工作函数，将 announce_highest 中的参数作为变量使用
     def say(*scores):
         assert len(scores) == 2
         gain = scores[who] - last_score
+        # 更新将 announce_highest 中的参数
         if gain > running_high:
             print(gain, "point(s)! That's the biggest gain yet for Player", who)
             return announce_highest(who,scores[who],gain)
@@ -282,6 +284,11 @@ def make_averaged(original_function, trials_count=1000):
     """
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    def try_and_average(*args):
+        res = [original_function(*args) for i in range(trials_count)]
+        return sum(res)/trials_count
+    return try_and_average
+
     # END PROBLEM 8
 
 
@@ -296,6 +303,9 @@ def max_scoring_num_rolls(dice=six_sided, trials_count=1000):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    ma = make_averaged(roll_dice,trials_count)
+    trials = [ma(i,dice) for i in range(1,11)]
+    return trials.index(max(trials)) + 1
     # END PROBLEM 9
 
 
@@ -345,7 +355,7 @@ def bacon_strategy(score, opponent_score, cutoff=8, num_rolls=6):
     rolls NUM_ROLLS otherwise.
     """
     # BEGIN PROBLEM 10
-    return 6  # Replace this statement
+    return 0 if free_bacon(opponent_score) >= cutoff else num_rolls
     # END PROBLEM 10
 
 
@@ -355,17 +365,42 @@ def swap_strategy(score, opponent_score, cutoff=8, num_rolls=6):
     non-beneficial swap. Otherwise, it rolls NUM_ROLLS.
     """
     # BEGIN PROBLEM 11
-    return 6  # Replace this statement
+    fb = free_bacon(opponent_score)
+    if is_swap(score+fb,opponent_score):
+        if score >= opponent_score:
+            return num_rolls
+        else:
+            return 0
+    else:
+        if fb>cutoff:
+            return 0
+        else:
+            return num_rolls
     # END PROBLEM 11
 
 
-def final_strategy(score, opponent_score):
+def final_strategy(score, opponent_score, cutoff=5, num_rolls=6):
     """Write a brief description of your final strategy.
 
     *** YOUR DESCRIPTION HERE ***
     """
     # BEGIN PROBLEM 12
-    return 6  # Replace this statement
+    if is_swap(score + 1, opponent_score) and opponent_score - score >= cutoff:
+        return 0
+    fb = free_bacon(opponent_score)
+    if is_swap(score + fb, opponent_score):
+        if opponent_score <= score + fb:
+            return num_rolls
+        else:
+            if opponent_score - score - fb < cutoff:
+                return num_rolls
+            else:
+                return 0
+    else:
+        if fb >= cutoff:
+            return 0
+        else:
+            return num_rolls
     # END PROBLEM 12
 
 ##########################
